@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http:www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>login page</title>
+    <script th:src="@{sockjs.min.js}"></script>
+    <script th:src="@{stomp.min.js}"></script>
+    <script th:src="@{jquery-3.3.1.min.js}"></script>
+
+</head>
+<body>
+<p>
+    聊天室
+</p>
+<form id="wangform">
+    <textarea row="4" cols="60" name="text"></textarea>
+    <input type="submit"/>
+</form>
+<script th:inline="javascript">
+    $("#wangform").submit(function(e){
+        e.preventDefault();
+        var text=$('#wangform').find('textarea[name="text"]').val();
+        sendSpittle(text);
+
+    });
+    var sock=new SockJS("/endpointChat");
+    var stomp =  Stomp.over(sock);
+    stomp.connect("guest","guest",function(frame){
+        stomp.subscribe("/user/queue/notifications",handleNotification);
+    });
+    function handleNotification(message){
+        $('#output').append("<b>Received: "+message.body+" </b><br/>")
+    }
+    function sendSpittle(text){
+        stomp.send("/chat",{},text);
+    }
+    $('#stop').click(function(){sock.close();});
+</script>
+<div id="output"></div>
+</body>
+</html>

@@ -31,7 +31,7 @@
 
     }
     function connect(){
-        var socket=new SockJS('/endPointWang');
+        var socket=new SockJS('/endpointWang');
         stompClient=Stomp.over(socket);
         stompClient.connect({},function(frame){
             setConnected(true);
